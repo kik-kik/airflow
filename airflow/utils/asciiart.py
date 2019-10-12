@@ -17,6 +17,8 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+"""Module containing ASCII art"""
+
 bug = r"""
       =,             .=
      =.|    ,---.    |.=
