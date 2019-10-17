@@ -17,6 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+"""Module containing helper functions for operators"""
 
 AIRFLOW_VAR_NAME_FORMAT_MAPPING = {
     'AIRFLOW_CONTEXT_DAG_ID': {'default': 'airflow.ctx.dag_id',
