@@ -16,6 +16,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+"""Module containing utils for Airflow DB"""
 
 import contextlib
 import os
@@ -72,6 +73,9 @@ def provide_session(func):
 
 @provide_session
 def merge_conn(conn, session=None):
+    """
+    Adds connection to session if there is not an existing entry for it
+    """
     from airflow.models import Connection
     if not session.query(Connection).filter(Connection.conn_id == conn.conn_id).first():
         session.add(conn)
@@ -80,6 +84,9 @@ def merge_conn(conn, session=None):
 
 @provide_session
 def add_default_pool_if_not_exists(session=None):
+    """
+    Creates a default pool if one does not already exist
+    """
     from airflow.models.pool import Pool
     if not Pool.get_pool(Pool.DEFAULT_POOL_NAME, session=session):
         default_pool = Pool(
@@ -93,6 +100,9 @@ def add_default_pool_if_not_exists(session=None):
 
 
 def initdb():
+    """
+    Function initialising Airflow's DB
+    """
     from airflow import models
     from airflow.models import Connection
     upgradedb()
@@ -273,7 +283,7 @@ def initdb():
     merge_conn(
         Connection(
             conn_id='segment_default', conn_type='segment',
-            extra='{"write_key": "my-segment-write-key"}')),
+            extra='{"write_key": "my-segment-write-key"}'))
     merge_conn(
         Connection(
             conn_id='azure_data_lake_default', conn_type='azure_data_lake',
@@ -307,10 +317,13 @@ def initdb():
     models.DAG.deactivate_unknown_dags(dagbag.dags.keys())
 
     from flask_appbuilder.models.sqla import Base
-    Base.metadata.create_all(settings.engine)
+    Base.metadata.create_all(settings.engine)  # pylint: disable=no-member
 
 
 def upgradedb():
+    """
+    Upgrades the metadata database to latest version
+    """
     # alembic adds significant import time, so we import it lazily
     from alembic import command
     from alembic.config import Config
@@ -340,11 +353,11 @@ def resetdb():
 
     connection = settings.engine.connect()
     models.base.Base.metadata.drop_all(connection)
-    mc = MigrationContext.configure(connection)
-    if mc._version.exists(connection):
-        mc._version.drop(connection)
+    migration_context = MigrationContext.configure(connection)
+    if migration_context._version.exists(connection):  # pylint: disable=protected-access
+        migration_context._version.drop(connection)  # pylint: disable=protected-access
 
     from flask_appbuilder.models.sqla import Base
-    Base.metadata.drop_all(connection)
+    Base.metadata.drop_all(connection)  # pylint: disable=no-member
 
     initdb()
