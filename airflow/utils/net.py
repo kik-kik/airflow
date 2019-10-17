@@ -17,6 +17,8 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+"""Module containing util functions for networking"""
+
 import importlib
 import socket
 
@@ -24,6 +26,7 @@ from airflow.configuration import AirflowConfigException, conf
 
 
 def get_host_ip_address():
+    """Returns IP address of host"""
     return socket.gethostbyname(socket.getfqdn())
 
 
@@ -46,5 +49,5 @@ def get_hostname():
     # Since we have a callable path, we try to import and run it next.
     module_path, attr_name = callable_path.split(':')
     module = importlib.import_module(module_path)
-    callable = getattr(module, attr_name)
-    return callable()
+    _callable = getattr(module, attr_name)
+    return _callable()
