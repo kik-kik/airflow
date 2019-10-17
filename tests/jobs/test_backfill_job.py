@@ -39,7 +39,7 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.utils import timezone
 from airflow.utils.db import create_session
 from airflow.utils.state import State
-from airflow.utils.timeout import timeout
+from airflow.utils.timeout import Timeout
 from tests.compat import Mock, patch
 from tests.executors.test_executor import TestExecutor
 from tests.test_utils.db import clear_db_pools, clear_db_runs, set_default_pool_slots
@@ -775,7 +775,7 @@ class TestBackfillJob(unittest.TestCase):
         # run with timeout because this creates an infinite loop if not
         # caught
         try:
-            with timeout(seconds=5):
+            with Timeout(seconds=5):
                 job.run()
         except AirflowTaskTimeout:
             pass
@@ -1251,7 +1251,7 @@ class TestBackfillJob(unittest.TestCase):
                           executor=executor,
                           donot_pickle=True)
 
-        with timeout(seconds=30):
+        with Timeout(seconds=30):
             job.run()
 
         ti_subdag = TI(
@@ -1319,7 +1319,7 @@ class TestBackfillJob(unittest.TestCase):
         session = settings.Session()
         session.merge(removed_task_ti)
 
-        with timeout(seconds=30):
+        with Timeout(seconds=30):
             job.run()
 
         for task in subdag.tasks:

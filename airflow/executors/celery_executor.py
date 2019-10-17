@@ -32,7 +32,7 @@ from airflow.exceptions import AirflowException
 from airflow.executors.base_executor import BaseExecutor
 from airflow.utils.log.logging_mixin import LoggingMixin
 from airflow.utils.module_loading import import_string
-from airflow.utils.timeout import timeout
+from airflow.utils.timeout import Timeout
 
 # Make it constant for unit test.
 CELERY_FETCH_ERR_MSG_HEADER = 'Error fetching Celery task state'
@@ -99,7 +99,7 @@ def fetch_celery_task_state(celery_task):
     """
 
     try:
-        with timeout(seconds=2):
+        with Timeout(seconds=2):
             # Accessing state property of celery task will make actual network request
             # to get the current state of the task.
             res = (celery_task[0], celery_task[1].state)
@@ -113,7 +113,7 @@ def fetch_celery_task_state(celery_task):
 def send_task_to_executor(task_tuple):
     key, _, command, queue, task = task_tuple
     try:
-        with timeout(seconds=2):
+        with Timeout(seconds=2):
             result = task.apply_async(args=[command], queue=queue)
     except Exception as e:
         exception_traceback = "Celery Task ID: {}\n{}".format(key,

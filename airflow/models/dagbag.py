@@ -42,7 +42,7 @@ from airflow.utils.db import provide_session
 from airflow.utils.helpers import pprinttable
 from airflow.utils.log.logging_mixin import LoggingMixin
 from airflow.utils.state import State
-from airflow.utils.timeout import timeout
+from airflow.utils.timeout import Timeout
 
 
 class DagBag(BaseDagBag, LoggingMixin):
@@ -197,7 +197,7 @@ class DagBag(BaseDagBag, LoggingMixin):
             if mod_name in sys.modules:
                 del sys.modules[mod_name]
 
-            with timeout(self.DAGBAG_IMPORT_TIMEOUT):
+            with Timeout(self.DAGBAG_IMPORT_TIMEOUT):
                 try:
                     m = imp.load_source(mod_name, filepath)
                     mods.append(m)

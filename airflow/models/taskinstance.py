@@ -60,7 +60,7 @@ from airflow.utils.log.logging_mixin import LoggingMixin
 from airflow.utils.net import get_hostname
 from airflow.utils.sqlalchemy import UtcDateTime
 from airflow.utils.state import State
-from airflow.utils.timeout import timeout
+from airflow.utils.timeout import Timeout
 
 
 def clear_task_instances(tis,
@@ -922,7 +922,7 @@ class TaskInstance(Base, LoggingMixin):
                 result = None
                 if task_copy.execution_timeout:
                     try:
-                        with timeout(int(
+                        with Timeout(int(
                                 task_copy.execution_timeout.total_seconds())):
                             result = task_copy.execute(context=context)
                     except AirflowTaskTimeout:
